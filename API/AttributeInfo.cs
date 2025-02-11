@@ -11,7 +11,7 @@ namespace AC.API {
     /// Represents a specific Attribute on a creature (Like Strength, Endurance, etc)
     /// </summary>
     public class AttributeInfo {
-        private Character character => CoreACPlugin.Instance.Game.Character;
+        private Character character => ACPlugin.Instance.Game.Character;
 
         /// <summary>
         /// Attribute type

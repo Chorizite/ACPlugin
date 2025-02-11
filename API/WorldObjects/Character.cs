@@ -35,7 +35,7 @@ namespace AC.API {
             get {
                 if (_setSpells == null) {
                     _setSpells = new HashSet<uint>();
-                    foreach (var spellSet in CoreACPlugin.Instance.Dat.SpellTable.SpellsSets.Values) {
+                    foreach (var spellSet in ACPlugin.Instance.Dat.SpellTable.SpellsSets.Values) {
                         foreach (var tier in spellSet.SpellSetTiers.Values) {
                             foreach (var spell in tier.Spells) {
                                 // cutoff for enchantment manager bug fix sorting
@@ -176,8 +176,8 @@ namespace AC.API {
         #endregion // Events
 
         public Character() {
-            _log = CoreACPlugin.Log;
-            _net = CoreACPlugin.Instance.Net;
+            _log = ACPlugin.Log;
+            _net = ACPlugin.Instance.Net;
 
             _net.C2S.OnLogin_SendEnterWorld += OnLogin_SendEnterWorld;
             _net.S2C.OnLogin_PlayerDescription += OnLogin_PlayerDescription;
@@ -755,7 +755,7 @@ namespace AC.API {
         }
 
         internal void SetWielded(WorldObject weenie, EquipMask slot) {
-            weenie.AddOrUpdateValue(PropertyInstanceId.Wielder, CoreACPlugin.Instance.Game.Character.Id);
+            weenie.AddOrUpdateValue(PropertyInstanceId.Wielder, ACPlugin.Instance.Game.Character.Id);
             weenie.AddOrUpdateValue(PropertyInt.CurrentWieldedLocation, (int)slot);
 
             //Equipment.Add(weenie);

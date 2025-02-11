@@ -43,7 +43,7 @@ namespace AC.API.WorldObjects {
         /// The parent container, if any
         /// </summary>
         [JsonIgnore]
-        public Container? ParentContainer => CoreACPlugin.Instance.Game.World.Get(Value(PropertyInstanceId.Container)) as Container;
+        public Container? ParentContainer => ACPlugin.Instance.Game.World.Get(Value(PropertyInstanceId.Container)) as Container;
 
         /// <summary>
         /// Icon effects, like border highlights
@@ -67,7 +67,7 @@ namespace AC.API.WorldObjects {
         /// Is this item owned by you (in your backpack or one of your side packs).
         /// </summary>
         [JsonIgnore]
-        public bool IsOwnedByMe => ParentContainer?.Id == CoreACPlugin.Instance.Game.Character.Id || ParentContainer?.ParentContainer?.Id == CoreACPlugin.Instance.Game.Character.Id;
+        public bool IsOwnedByMe => ParentContainer?.Id == ACPlugin.Instance.Game.Character.Id || ParentContainer?.ParentContainer?.Id == ACPlugin.Instance.Game.Character.Id;
 
         internal void UpdateSpells(List<LayeredSpellId> spellBook) {
             if (spellBook == null || spellBook == null)

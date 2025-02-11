@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace AC.API {
     public class SkillInfo {
-        private Character character => CoreACPlugin.Instance.Game.Character;
+        private Character character => ACPlugin.Instance.Game.Character;
         private SkillAdvancementClass _training = SkillAdvancementClass.Unusable;
         private SkillFormula _formula;
         private SkillBase _dat;
@@ -153,7 +153,7 @@ namespace AC.API {
         public SkillBase Dat {
             get {
                 if (_dat is null) {
-                    if (CoreACPlugin.Instance.Dat.SkillTable.Skills.TryGetValue((DatReaderWriter.Enums.SkillId)Type, out SkillBase skillBase)) {
+                    if (ACPlugin.Instance.Dat.SkillTable.Skills.TryGetValue((DatReaderWriter.Enums.SkillId)Type, out SkillBase skillBase)) {
                         _dat = skillBase;
                     }
                     else {
@@ -189,7 +189,7 @@ namespace AC.API {
             get {
                 if (_heritageSkill is null) {
                     var myHeritage = character.Heritage;
-                    if (CoreACPlugin.Instance.Dat.Portal.CharGen?.HeritageGroups?.TryGetValue((uint)myHeritage, out var heritage) == true) {
+                    if (ACPlugin.Instance.Dat.Portal.CharGen?.HeritageGroups?.TryGetValue((uint)myHeritage, out var heritage) == true) {
                         _heritageSkill = heritage.Skills.FirstOrDefault(f => (SkillId)f.Id == Type);
                     }
                 }

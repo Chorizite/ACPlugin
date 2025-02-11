@@ -111,8 +111,8 @@ namespace AC.API {
         private WeakEvent<EventArgs> _OnWorldInfo = new();
 
         public Game() {
-            _log = CoreACPlugin.Log;
-            _net = CoreACPlugin.Instance.Net;
+            _log = ACPlugin.Log;
+            _net = ACPlugin.Instance.Net;
 
             _net.S2C.OnLogin_WorldInfo += OnLogin_WorldInfo;
             _net.S2C.OnLogin_LoginCharacterSet += OnLogin_LoginCharacterSet;
@@ -135,7 +135,7 @@ namespace AC.API {
                 return false;
             }
             if (Characters.Any(c => c.Id == characterId)) {
-                return CoreACPlugin.Instance.ClientBackend.EnterGame(characterId);
+                return ACPlugin.Instance.ClientBackend.EnterGame(characterId);
             }
             _log.LogWarning($"Unable to login as Character with id 0x{characterId:X8} not found! {string.Join(", ", Characters.Select(c => c.ToString()))}");
             return false;
@@ -149,7 +149,7 @@ namespace AC.API {
         public bool Login(CharacterIdentity characterIdentity) => Login(characterIdentity.Id);
 
         public void SetScreen(GameScreen screen) {
-            CoreACPlugin.Instance.ClientBackend.GameScreen = (int)screen;
+            ACPlugin.Instance.ClientBackend.GameScreen = (int)screen;
         }
         #endregion // Public API
 

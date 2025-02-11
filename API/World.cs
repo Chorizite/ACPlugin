@@ -33,7 +33,7 @@ namespace AC.API {
         /// The currently selected world object, if any
         /// </summary>
         [JsonIgnore]
-        public WorldObject? Selected => CoreACPlugin.Instance.Game.World.Get(CoreACPlugin.Instance.ClientBackend.SelectedObjectId);
+        public WorldObject? Selected => ACPlugin.Instance.Game.World.Get(ACPlugin.Instance.ClientBackend.SelectedObjectId);
 
         /// <summary>
         /// Fired when a new world object is created
@@ -82,8 +82,8 @@ namespace AC.API {
 
 
         public World() {
-            _log = CoreACPlugin.Log;
-            _net = CoreACPlugin.Instance.Net;
+            _log = ACPlugin.Log;
+            _net = ACPlugin.Instance.Net;
 
             _net.S2C.OnItem_CreateObject += OnItem_CreateObject;
             _net.S2C.OnItem_DeleteObject += OnItem_DeleteObject;
@@ -130,7 +130,7 @@ namespace AC.API {
             _net.S2C.OnQualities_UpdateSkill += OnQualities_UpdateSkill_S2C;
             _net.S2C.OnQualities_UpdateString += OnQualities_UpdateString_S2C;
 
-            CoreACPlugin.Instance.ClientBackend.OnObjectSelected += OnObjectSelected;
+            ACPlugin.Instance.ClientBackend.OnObjectSelected += OnObjectSelected;
         }
 
         #region public API
@@ -175,8 +175,8 @@ namespace AC.API {
         private void OnItem_CreateObject(object? sender, Item_CreateObject e) {
             WorldObject? weenie = null;
 
-            if (e.ObjectId == CoreACPlugin.Instance.Game.Character.Id) {
-                weenie = CoreACPlugin.Instance.Game.Character;
+            if (e.ObjectId == ACPlugin.Instance.Game.Character.Id) {
+                weenie = ACPlugin.Instance.Game.Character;
                 Weenies.TryAdd(e.ObjectId, weenie);
             }
             else {
@@ -225,7 +225,7 @@ namespace AC.API {
                 weeniesToWatchFor.Add(weenie.Id);
             }
 
-            if (container.ParentContainer?.Id != CoreACPlugin.Instance.Game.Character.Id) {
+            if (container.ParentContainer?.Id != ACPlugin.Instance.Game.Character.Id) {
                 OpenContainer = container;
 
                 if (weeniesToWatchFor.Count == 0) {
@@ -309,8 +309,8 @@ namespace AC.API {
                     continue;
                 }
                 var container = CreateContainer(profile.ObjectId, profile.ContainerType);
-                container.AddOrUpdateValue(PropertyInstanceId.Container, CoreACPlugin.Instance.Game.Character.Id);
-                CoreACPlugin.Instance.Game.Character.Containers.Add(container);
+                container.AddOrUpdateValue(PropertyInstanceId.Container, ACPlugin.Instance.Game.Character.Id);
+                ACPlugin.Instance.Game.Character.Containers.Add(container);
             }
         }
 
@@ -373,7 +373,7 @@ namespace AC.API {
             }
 
             MoveWeenie(item, null, 0);
-            CoreACPlugin.Instance.Game.Character.SetWielded(weenie, e.Slot);
+            ACPlugin.Instance.Game.Character.SetWielded(weenie, e.Slot);
         }
 
         private void OnItem_QueryItemManaResponse(object? sender, Item_QueryItemManaResponse e) {
@@ -732,7 +732,7 @@ namespace AC.API {
         }
 
         private void RemoveWeenie(uint weenieId) {
-            if (weenieId == CoreACPlugin.Instance.Game.Character.Id)
+            if (weenieId == ACPlugin.Instance.Game.Character.Id)
                 return;
 
             if (Weenies.Remove(weenieId, out WorldObject? weenieToRemove)) {
@@ -815,7 +815,7 @@ namespace AC.API {
             _net.S2C.OnQualities_UpdateSkill -= OnQualities_UpdateSkill_S2C;
             _net.S2C.OnQualities_UpdateString -= OnQualities_UpdateString_S2C;
 
-            CoreACPlugin.Instance.ClientBackend.OnObjectSelected -= OnObjectSelected;
+            ACPlugin.Instance.ClientBackend.OnObjectSelected -= OnObjectSelected;
         }
     }
 }

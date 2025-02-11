@@ -10,7 +10,7 @@ namespace AC.API.WorldObjects {
         /// <summary>
         /// The wielder of this equipment, if any
         /// </summary>
-        public Creature? Wielder => CoreACPlugin.Instance.Game.World.Get((uint)Value(PropertyInstanceId.Wielder)) as Creature;
+        public Creature? Wielder => ACPlugin.Instance.Game.World.Get((uint)Value(PropertyInstanceId.Wielder)) as Creature;
 
         public Equippable() {
         }

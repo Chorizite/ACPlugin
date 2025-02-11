@@ -6,36 +6,34 @@ using Chorizite.Core.Plugins.AssemblyLoader;
 using AC.Lib;
 using Chorizite.Core.Net;
 using Chorizite.ACProtocol;
-using Core.UI;
-using AC.UIModels;
 using Chorizite.Core.Render;
 using System.Collections.Generic;
 using System.Xml.Linq;
-using Core.UI.Lib;
 using Chorizite.Core.Backend;
 using Chorizite.Core.Input;
 using Chorizite.Common;
 using System.Text.Json.Serialization.Metadata;
 using AC.Lib.Screens;
-using ACUI.Lib;
 using AC.API;
 using Chorizite.Core.Dats;
 using Chorizite.Core.Backend.Client;
+using RmlUi.Lib;
+using RmlUi;
 
 namespace AC {
     /// <summary>
     /// Core AC Plugin. Provides api access to ACClient stuffs.
     /// </summary>
-    public class CoreACPlugin : IPluginCore, IScreenProvider<GameScreen>, ISerializeState<PluginState> {
+    public class ACPlugin : IPluginCore, IScreenProvider<GameScreen>, ISerializeState<PluginState> {
         private readonly Dictionary<GameScreen, string> _registeredGameScreens = [];
         private PluginState _state;
         private Panel? _indicatorPanel;
         private Panel? _tooltip;
 
         internal static ILogger Log;
-        internal static CoreACPlugin Instance;
+        internal static ACPlugin Instance;
 
-        internal CoreUIPlugin CoreUI { get; }
+        internal RmlUiPlugin RmlUi { get; }
         internal NetworkParser Net { get; }
         internal IClientBackend ClientBackend { get; }
         internal IChoriziteBackend ChoriziteBackend { get; }
@@ -66,23 +64,18 @@ namespace AC {
         }
         private readonly WeakEvent<ScreenChangedEventArgs> _OnScreenChanged = new();
 
-        protected CoreACPlugin(AssemblyPluginManifest manifest, IChoriziteBackend choriziteBackend, IClientBackend clientBackend, IPluginManager pluginManager, NetworkParser net, CoreUIPlugin coreUI, IDatReaderInterface dat, ILogger log) : base(manifest) {
+        protected ACPlugin(AssemblyPluginManifest manifest, IChoriziteBackend choriziteBackend, IClientBackend clientBackend, IPluginManager pluginManager, NetworkParser net, RmlUiPlugin rmlUi, IDatReaderInterface dat, ILogger log) : base(manifest) {
             Instance = this;
             Log = log;
             Net = net;
-            CoreUI = coreUI;
+            RmlUi = rmlUi;
             ClientBackend = clientBackend;
             ChoriziteBackend = choriziteBackend;
             Dat = dat;
-
-            // since this plugin is ISerializeState<ACState>, we wait to do full initialization until after loading state.
-            // ISerializeState{ACState}.DeserializeAfterLoad(ACState?) is now responsible for calling Init()
         }
 
         protected override void Initialize() {
             DragDropManager = new DragDropManager();
-
-            CoreUI.RegisterUIModel("Tooltip", _state.TooltipModel);
 
             RegisterScreen(GameScreen.CharSelect, Path.Combine(AssemblyDirectory, "assets", "screens", "CharSelect.rml"));
             RegisterScreen(GameScreen.DatPatch, Path.Combine(AssemblyDirectory, "assets", "screens", "DatPatch.rml"));
@@ -108,7 +101,6 @@ namespace AC {
 
         void ISerializeState<PluginState>.DeserializeAfterLoad(PluginState? state) {
             _state = state ?? new PluginState();
-            _state.TooltipModel ??= new TooltipModel();
             _state.Game ??= new Game();
         }
         #endregion // State / Settings Serialization
@@ -122,7 +114,7 @@ namespace AC {
         }
 
         private bool ShowIndicatorsPanel() {
-            _indicatorPanel ??= CoreUI.CreatePanel("Core.AC.Indicators", Path.Combine(AssemblyDirectory, "assets", "panels", "Indicators.rml"));
+            _indicatorPanel ??= RmlUi.CreatePanel("Core.AC.Indicators", Path.Combine(AssemblyDirectory, "assets", "panels", "Indicators.rml"));
             if (_indicatorPanel is not null) {
                 _indicatorPanel.Show();
                 return true;
@@ -160,14 +152,14 @@ namespace AC {
             if (force || _state.CurrentScreen != value) {
                 var oldScreen = _state.CurrentScreen;
                 _state.CurrentScreen = value;
-                CoreUI.Screen = _state.CurrentScreen.ToString();
+                RmlUi.Screen = _state.CurrentScreen.ToString();
 
                 _OnScreenChanged?.Invoke(this, new ScreenChangedEventArgs(oldScreen, _state.CurrentScreen));
             }
         }
         private void ClientBackend_OnScreenChanged(object? sender, EventArgs e) {
             CurrentScreen = (GameScreen)ClientBackend.GameScreen;
-            CoreUI.PanelManager.CloseModal();
+            RmlUi.PanelManager.CloseModal();
         }
 
         /// <inheritdoc/>
@@ -179,7 +171,7 @@ namespace AC {
                 _registeredGameScreens.Add(screen, rmlPath);
             }
 
-            return CoreUI.RegisterScreen(screen.ToString(), rmlPath);
+            return RmlUi.RegisterScreen(screen.ToString(), rmlPath);
         }
 
         /// <inheritdoc/>
@@ -188,7 +180,7 @@ namespace AC {
                 _registeredGameScreens.Remove(screen);
             }
 
-            CoreUI.UnregisterScreen(screen.ToString(), rmlPath);
+            RmlUi.UnregisterScreen(screen.ToString(), rmlPath);
         }
 
         /// <inheritdoc/>
@@ -203,7 +195,7 @@ namespace AC {
             ClientBackend.UIBackend.OnHideRootElement -= ClientBackend_OnHideRootElement;
 
             DragDropManager.Dispose();
-            CoreUI.Screen = "None";
+            RmlUi.Screen = "None";
 
             foreach (var screen in _registeredGameScreens) {
                 UnregisterScreen(screen.Key, screen.Value);
@@ -213,9 +205,6 @@ namespace AC {
             _indicatorPanel?.Dispose();
             _indicatorPanel = null;
 
-            CoreUI.UnregisterUIModel("Tooltip", _state.TooltipModel);
-
-            _state.TooltipModel.Dispose();
             Game?.Dispose();
 
             _state = null;

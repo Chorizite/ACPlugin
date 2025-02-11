@@ -1,8 +1,8 @@
-﻿using ACUI.Lib;
-using Chorizite.Core.Backend.Client;
+﻿using Chorizite.Core.Backend.Client;
 using Chorizite.Core.Input;
-using Core.UI;
 using Microsoft.Extensions.Logging;
+using RmlUi;
+using RmlUi.Lib;
 using RmlUiNet;
 using RmlUiNet.Input;
 using System;
@@ -23,13 +23,13 @@ namespace AC.Lib {
         private int _mouseStartY = 0;
 
         public DragDropManager() {
-            CoreACPlugin.Instance.ClientBackend.UIBackend.OnGameObjectDragStart += OnGameObjectDragStart;
-            CoreACPlugin.Instance.ClientBackend.UIBackend.OnGameObjectDragEnd += OnGameObjectDragEnd;
-            CoreACPlugin.Instance.ChoriziteBackend.Input.OnMouseDown += Input_OnMouseDown;
+            ACPlugin.Instance.ClientBackend.UIBackend.OnGameObjectDragStart += OnGameObjectDragStart;
+            ACPlugin.Instance.ClientBackend.UIBackend.OnGameObjectDragEnd += OnGameObjectDragEnd;
+            ACPlugin.Instance.ChoriziteBackend.Input.OnMouseDown += Input_OnMouseDown;
 
-            _panelPath = Path.Combine(CoreACPlugin.Instance.AssemblyDirectory, "assets", "panels", "DragDropOverlay.rml");
+            _panelPath = Path.Combine(ACPlugin.Instance.AssemblyDirectory, "assets", "panels", "DragDropOverlay.rml");
             if (File.Exists(_panelPath)) {
-                _panel = CoreACPlugin.Instance.CoreUI.CreatePanel("DragDropOverlay", _panelPath);
+                _panel = ACPlugin.Instance.RmlUi.CreatePanel("DragDropOverlay", _panelPath);
                 if (_panel is not null) {
                     _panel.IsGhost = true;
                     _panel.Hide();
@@ -38,8 +38,8 @@ namespace AC.Lib {
         }
 
         private void Input_OnMouseDown(object? sender, MouseDownEventArgs e) {
-            _mouseStartX = CoreACPlugin.Instance.ChoriziteBackend.Input.MouseX;
-            _mouseStartY = CoreACPlugin.Instance.ChoriziteBackend.Input.MouseY;
+            _mouseStartX = ACPlugin.Instance.ChoriziteBackend.Input.MouseX;
+            _mouseStartY = ACPlugin.Instance.ChoriziteBackend.Input.MouseY;
         }
 
         private void OnGameObjectDragStart(object? sender, GameObjectDragDropEventArgs e) {
@@ -56,7 +56,7 @@ namespace AC.Lib {
                 { "IconEffects", (uint)e.IconData.Effects },
             };
 
-            CoreUIPlugin.Instance.PanelManager.SetExternalDragDropEventData(_dragDropExternalData);
+            RmlUiPlugin.Instance.PanelManager.SetExternalDragDropEventData(_dragDropExternalData);
 
             _panel.Show();
             if (e.IsSpell) {
@@ -72,13 +72,13 @@ namespace AC.Lib {
 
                 // first update the rmlui context so that this the dragdrop overlay is in the correct position
                 // and rendered, then fake a mouse down on it to start the drag operation
-                CoreUIPlugin.Instance.Context.Update();
-                CoreUIPlugin.Instance.Context.Update();
-                CoreUIPlugin.Instance.Context.ProcessMouseButtonDown(0, KeyModifier.None);
+                RmlUiPlugin.Instance.Context.Update();
+                RmlUiPlugin.Instance.Context.Update();
+                RmlUiPlugin.Instance.Context.ProcessMouseButtonDown(0, KeyModifier.None);
 
-                CoreACPlugin.Instance.ChoriziteBackend.Input.OnMouseUp += Input_OnMouseUp;
-                CoreACPlugin.Instance.ChoriziteBackend.Input.OnMouseMove += Input_OnMouseMove;
-                CoreUIPlugin.Instance.Context.Update();
+                ACPlugin.Instance.ChoriziteBackend.Input.OnMouseUp += Input_OnMouseUp;
+                ACPlugin.Instance.ChoriziteBackend.Input.OnMouseMove += Input_OnMouseMove;
+                RmlUiPlugin.Instance.Context.Update();
             }
         }
 
@@ -93,8 +93,8 @@ namespace AC.Lib {
 
         private void Input_OnMouseUp(object? sender, MouseUpEventArgs e) {
             // if there is a panel under the mouse, cancel the game drag
-            if (_showingDragDropOverlay && CoreUIPlugin.Instance?.PanelManager.IsAnyPanelUnderMouse() == true) {
-                CoreACPlugin.Instance.ClientBackend.UIBackend.ClearDragandDrop();
+            if (_showingDragDropOverlay && RmlUiPlugin.Instance?.PanelManager.IsAnyPanelUnderMouse() == true) {
+                ACPlugin.Instance.ClientBackend.UIBackend.ClearDragandDrop();
                 // dont eat (this is true because CoreUI says we are interacting with rmlui, not the game)
                 // we dont eat otherwise the game will never see the mouse up, and not properly cancel the drag
                 e.Eat = false;
@@ -106,8 +106,8 @@ namespace AC.Lib {
             if (element is null) return;
 
 
-            var x = CoreACPlugin.Instance.ChoriziteBackend.Input.MouseX;
-            var y = CoreACPlugin.Instance.ChoriziteBackend.Input.MouseY;
+            var x = ACPlugin.Instance.ChoriziteBackend.Input.MouseX;
+            var y = ACPlugin.Instance.ChoriziteBackend.Input.MouseY;
             x -= ((int)element.GetClientWidth() / 2);
             y -= ((int)element.GetClientHeight() / 2);
             element?.SetAttribute("style", "left: " + x + "px; top: " + y + "px;");
@@ -117,14 +117,14 @@ namespace AC.Lib {
             if (_panel is null) return;
 
             if (_dragDropExternalData is not null) {
-                CoreUIPlugin.Instance.PanelManager.ClearExternalDragDropEventData(_dragDropExternalData);
+                RmlUiPlugin.Instance.PanelManager.ClearExternalDragDropEventData(_dragDropExternalData);
                 _dragDropExternalData = null;
             }
-            CoreACPlugin.Instance.ChoriziteBackend.Input.OnMouseUp -= Input_OnMouseUp;
-            CoreACPlugin.Instance.ChoriziteBackend.Input.OnMouseMove -= Input_OnMouseMove;
+            ACPlugin.Instance.ChoriziteBackend.Input.OnMouseUp -= Input_OnMouseUp;
+            ACPlugin.Instance.ChoriziteBackend.Input.OnMouseMove -= Input_OnMouseMove;
 
             // if there is a panel under the mouse, eat the event so the game doesn't handle it
-            if (CoreUIPlugin.Instance?.PanelManager.IsAnyPanelUnderMouse() == true) {
+            if (RmlUiPlugin.Instance?.PanelManager.IsAnyPanelUnderMouse() == true) {
                 e.Eat = true;
             }
 
@@ -133,14 +133,14 @@ namespace AC.Lib {
         }
 
         public void Dispose() {
-            CoreACPlugin.Instance.ClientBackend.UIBackend.OnGameObjectDragStart -= OnGameObjectDragStart;
-            CoreACPlugin.Instance.ClientBackend.UIBackend.OnGameObjectDragEnd -= OnGameObjectDragEnd;
-            CoreACPlugin.Instance.ChoriziteBackend.Input.OnMouseUp -= Input_OnMouseUp;
-            CoreACPlugin.Instance.ChoriziteBackend.Input.OnMouseDown -= Input_OnMouseDown;
-            CoreACPlugin.Instance.ChoriziteBackend.Input.OnMouseMove -= Input_OnMouseMove;
+            ACPlugin.Instance.ClientBackend.UIBackend.OnGameObjectDragStart -= OnGameObjectDragStart;
+            ACPlugin.Instance.ClientBackend.UIBackend.OnGameObjectDragEnd -= OnGameObjectDragEnd;
+            ACPlugin.Instance.ChoriziteBackend.Input.OnMouseUp -= Input_OnMouseUp;
+            ACPlugin.Instance.ChoriziteBackend.Input.OnMouseDown -= Input_OnMouseDown;
+            ACPlugin.Instance.ChoriziteBackend.Input.OnMouseMove -= Input_OnMouseMove;
 
             if (_dragDropExternalData is not null) {
-                CoreUIPlugin.Instance.PanelManager.ClearExternalDragDropEventData(_dragDropExternalData);
+                RmlUiPlugin.Instance.PanelManager.ClearExternalDragDropEventData(_dragDropExternalData);
                 _dragDropExternalData = null;
             }
             _panel?.Dispose();

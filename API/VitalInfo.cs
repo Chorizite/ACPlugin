@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace AC.API {
     public class VitalInfo {
-        private Character character => CoreACPlugin.Instance.Game.Character;
+        private Character character => ACPlugin.Instance.Game.Character;
         private SkillFormula _formula;
 
         /// <summary>
@@ -39,13 +39,13 @@ namespace AC.API {
                     DatReaderWriter.Types.SkillFormula formula = null;
                     switch (Type) {
                         case VitalId.Health:
-                            formula = CoreACPlugin.Instance.Dat.VitalTable.Health;
+                            formula = ACPlugin.Instance.Dat.VitalTable.Health;
                             break;
                         case VitalId.Stamina:
-                            formula = CoreACPlugin.Instance.Dat.VitalTable.Stamina;
+                            formula = ACPlugin.Instance.Dat.VitalTable.Stamina;
                             break;
                         case VitalId.Mana:
-                            formula = CoreACPlugin.Instance.Dat.VitalTable.Mana;
+                            formula = ACPlugin.Instance.Dat.VitalTable.Mana;
                             break;
                     }
 

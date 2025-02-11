@@ -13,10 +13,10 @@
         /// </summary>
         /// <param name="id"></param>
         public void SelectObjectId(uint id) {
-            if (CoreACPlugin.Instance.Game.State != ClientState.InGame) {
+            if (ACPlugin.Instance.Game.State != ClientState.InGame) {
                 return;
             }
-            CoreACPlugin.Instance.ClientBackend.SelectedObjectId = id;
+            ACPlugin.Instance.ClientBackend.SelectedObjectId = id;
         }
     }
 }

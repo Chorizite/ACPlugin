@@ -1,7 +1,6 @@
 ﻿using Chorizite.ACProtocol.Enums;
 using Chorizite.ACProtocol;
 using Chorizite.Core.Net;
-using Core.UI.Models;
 using System;
 using Chorizite.ACProtocol.Messages.S2C;
 using Chorizite.Common;
@@ -67,7 +66,7 @@ namespace AC.API {
         private WeakEvent<EventArgs> _OnPatchProgress = new();
 
         public PatchProgress() {
-            _net = CoreACPlugin.Instance.Net;
+            _net = ACPlugin.Instance.Net;
             _net.OnS2CPacket += Net_OnS2CPacket;
             _net.OnC2SPacket += Net_OnC2SPacket;
 
