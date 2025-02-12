@@ -110,9 +110,9 @@
     <script type="">
       local rx = require('rx')
       local backend = require('ClientBackend')
-      local ui = require('Plugins.Core.UI')
-      local ac = require('Plugins.Core.AC').Game
-      local GameScreen = CS.Core.AC.Lib.Screens.GameScreen
+      local ui = require('Plugins.RmlUi')
+      local ac = require('Plugins.AC').Game
+      local GameScreen = CS.AC.Lib.Screens.GameScreen
 
       local state = rx:CreateState({
         SelectedId = 0,

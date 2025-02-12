@@ -76,7 +76,7 @@
       local rx = require('rx')
       local RootElementId = CS.Chorizite.Common.Enums.RootElementId
       local backend = require('ClientBackend')
-      local ui = require('Plugins.Core.UI')
+      local ui = require('Plugins.RmlUi')
       local PluginManager = require('PluginManager')
       local DamageType = CS.Chorizite.Common.Enums.DamageType
 
