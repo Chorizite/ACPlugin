@@ -91,9 +91,7 @@ namespace AC {
 
             SetScreen(_state.CurrentScreen, true);
 
-            if (Game.State == ClientState.InGame) {
-                ShowIndicatorsPanel();
-            }
+            ShowIndicatorsPanel();
         }
 
         #region State / Settings Serialization
@@ -114,7 +112,7 @@ namespace AC {
         }
 
         private bool ShowIndicatorsPanel() {
-            _indicatorPanel ??= RmlUi.CreatePanel("Core.AC.Indicators", Path.Combine(AssemblyDirectory, "assets", "panels", "Indicators.rml"));
+            _indicatorPanel ??= RmlUi.CreatePanel("AC.Indicators", Path.Combine(AssemblyDirectory, "assets", "panels", "Indicators.rml"));
             if (_indicatorPanel is not null) {
                 _indicatorPanel.Show();
                 return true;
