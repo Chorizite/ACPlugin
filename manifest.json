@@ -1,9 +1,10 @@
 {
-  "name": "AC",
+  "id": "AC",
+  "name": "AC Client Interface",
   "author": "Chorizite",
   "entryfile": "AC.dll",
   "version": "0.0.0-dev",
-  "description": "Game interface",
+  "description": "Plugin for interactive with the game client",
   "dependencies": [ "RmlUi@0.0.1" ],
   "environments": [ "Client" ]
 }
